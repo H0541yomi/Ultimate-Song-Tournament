@@ -8,39 +8,27 @@
   default-src 'self'; 
   script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://accounts.google.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  frame-src https://accounts.google.com;">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://apis.google.com/js/api.js"></script>
+  frame-src https://www.youtube.com;">
 </head>
 <body>
-    <button id="loginButton">Login with Google</button>
-    <button id="logoutButton" style="display: none;">Logout</button>
-
-    <div id="addSongSection">
-        <h2>Add Song</h2>
-        <input type="text" id="songTitle" placeholder="Song Title" disabled>
-        <input type="text" id="songUrl" placeholder="Song URL">
-        <button id="addSongButton">Add Song</button>
-    </div>
-
+    <button id="addSongButton">Add Song by URL</button>
+    <input type="text" id="songUrl" placeholder="Enter YouTube URL">
+    <button id="startTournamentButton" style="display: none;">Start Tournament</button>
     <div id="rankingSection" style="display: none;">
-        <button id="startTournamentButton">Start Tournament</button>
-    </div>
-
-    <div id="comparisonSection" style="display: none;">
-        <h3 id="comparisonPrompt"></h3>
-        <div id="leftSong" style="display: inline-block; width: 45%; text-align: center;">
-            <h4 id="leftTitle"></h4>
-            <div id="leftEmbed"></div>
-            <button id="chooseLeft">This song is better</button>
+        <p id="comparisonPrompt"></p>
+        <div id="songComparison">
+            <div id="leftSong" class="song">
+                <p id="leftTitle"></p>
+                <iframe id="leftVideo" width="300" height="200" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div id="rightSong" class="song">
+                <p id="rightTitle"></p>
+                <iframe id="rightVideo" width="300" height="200" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
         </div>
-        <div id="rightSong" style="display: inline-block; width: 45%; text-align: center;">
-            <h4 id="rightTitle"></h4>
-            <div id="rightEmbed"></div>
-            <button id="chooseRight">This song is better</button>
-        </div>
+        <button id="chooseLeft">This Song is Better</button>
+        <button id="chooseRight">This Song is Better</button>
     </div>
-
     <div id="results" style="display: none;">
         <h2>Ranked Playlist</h2>
         <ul id="rankedList"></ul>
