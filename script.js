@@ -2,6 +2,7 @@ let songs = [];
 let mergesortSteps = [];
 let currentComparison = null;
 let sortedSongs = [];
+const API_KEY = 'AIzaSyB9GXkUglNRtGVFtV3nZBncxEO8zKEjSGo';
 
 document.getElementById('addPlaylistButton').addEventListener('click', () => {
     const playlistUrl = document.getElementById('playlistUrl').value.trim();
@@ -105,13 +106,21 @@ function extractPlaylistId(url) {
 }
 
 async function fetchPlaylistVideos(playlistId) {
-    const response = await fetch(`https://api.example.com/playlist?playlistId=${playlistId}`);
-    const data = await response.json();
-    if (!data || !data.videos) {
-        throw new Error('Invalid playlist data');
+    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.items.map(item => ({
+            title: item.snippet.title,
+            videoId: item.snippet.resourceId.videoId
+        }));
+    } catch (error) {
+        console.error('Error fetching playlist videos:', error);
+        alert('Failed to fetch playlist videos. Please check the playlist ID and try again.');
+        throw error;
     }
-    return data.videos.map(video => ({
-        title: video.title,
-        videoId: video.id
-    }));
 }
