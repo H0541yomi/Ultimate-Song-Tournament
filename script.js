@@ -16,6 +16,8 @@ function initClient() {
         authInstance = gapi.auth2.getAuthInstance();
         document.getElementById('loginButton').addEventListener('click', login);
         document.getElementById('logoutButton').addEventListener('click', logout);
+    }).catch((error) => {
+        console.error('Error initializing Google API client:', error);
     });
 }
 
@@ -24,6 +26,8 @@ function login() {
         document.getElementById('loginButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'inline-block';
         fetchPlaylist();
+    }).catch((error) => {
+        console.error('Error signing in:', error);
     });
 }
 
@@ -36,6 +40,8 @@ function logout() {
         songs = [];
         mergesortSteps = [];
         sortedSongs = [];
+    }).catch((error) => {
+        console.error('Error signing out:', error);
     });
 }
 
@@ -43,27 +49,43 @@ async function fetchPlaylist() {
     const playlistId = prompt('Enter YouTube playlist ID:');
     if (!playlistId) return;
 
-    let nextPageToken = '';
-    do {
-        const response = await gapi.client.youtube.playlistItems.list({
-            part: 'snippet',
-            playlistId: playlistId,
-            maxResults: 50,
-            pageToken: nextPageToken
-        });
+    try {
+        // Ensure the user is signed in before making the API request
+        if (!authInstance.isSignedIn.get()) {
+            alert('You must be signed in to fetch a playlist.');
+            return;
+        }
 
-        songs.push(...response.result.items.map(item => ({
-            title: item.snippet.title,
-            videoId: item.snippet.resourceId.videoId
-        })));
+        const nextPageToken = '';
+        let nextPageToken = '';
+        do {
+            const response = await gapi.client.youtube.playlistItems.list({
+                part: 'snippet',
+                playlistId: playlistId,
+                maxResults: 50,
+                pageToken: nextPageToken
+            });
 
-        nextPageToken = response.result.nextPageToken || '';
-    } while (nextPageToken);
+            if (response.error) {
+                throw new Error('Failed to fetch playlist: ' + response.error.message);
+            }
 
-    if (songs.length) {
-        startRanking();
-    } else {
-        alert('No songs found in the playlist.');
+            songs.push(...response.result.items.map(item => ({
+                title: item.snippet.title,
+                videoId: item.snippet.resourceId.videoId
+            })));
+
+            nextPageToken = response.result.nextPageToken || '';
+        } while (nextPageToken);
+
+        if (songs.length) {
+            startRanking();
+        } else {
+            alert('No songs found in the playlist.');
+        }
+    } catch (error) {
+        console.error('Error fetching playlist:', error);
+        alert('There was an error fetching the playlist.');
     }
 }
 
