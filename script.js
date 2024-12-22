@@ -1,5 +1,7 @@
 let songs = [];
 let currentIndex = 0;
+const apiKey = 'YOUR_YOUTUBE_API_KEY';  // Replace with your YouTube API key
+let playlistId = '';  // Will be extracted from the URL
 
 class Song {
   constructor(title, creator, ytembed) {
@@ -9,21 +11,55 @@ class Song {
   }
 }
 
+// Function to extract the playlist ID from the URL
+function extractPlaylistId(url) {
+  const regex = /(?:list=)([a-zA-Z0-9_-]+)/;
+  const match = url.match(regex);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return null;
+}
+
 async function fetchPlaylist() {
   const playlistUrl = document.getElementById("playlist-url").value;
-  
-  // Fetch playlist data and extract song information (assuming the playlist is valid)
-  // In a real scenario, use the YouTube API to get the playlist details.
-  // For now, we will simulate song objects.
+  playlistId = extractPlaylistId(playlistUrl);
 
-  songs = [
-    new Song("Song Title 1", "Creator 1", "https://www.youtube.com/embed/example1"),
-    new Song("Song Title 2", "Creator 2", "https://www.youtube.com/embed/example2"),
-    new Song("Song Title 3", "Creator 3", "https://www.youtube.com/embed/example3"),
-    // More songs can be added here
-  ];
+  if (!playlistId) {
+    alert('Invalid Playlist URL');
+    return;
+  }
+
+  // Fetch the playlist details from YouTube API
+  await fetchSongsFromPlaylist();
 
   switchToSortingPhase();
+}
+
+async function fetchSongsFromPlaylist() {
+  const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`;
+  let nextPageToken = '';
+  
+  // Clear previous songs
+  songs = [];
+
+  // Fetch data and populate songs array
+  do {
+    const response = await fetch(url + (nextPageToken ? `&pageToken=${nextPageToken}` : ''));
+    const data = await response.json();
+
+    data.items.forEach(item => {
+      const title = item.snippet.title;
+      const creator = item.snippet.channelTitle;
+      const ytembed = `https://www.youtube.com/embed/${item.snippet.resourceId.videoId}`;
+      songs.push(new Song(title, creator, ytembed));
+    });
+
+    nextPageToken = data.nextPageToken;  // Get next page if there are more results
+
+  } while (nextPageToken);
+
+  console.log(songs);  // Log to see if the songs are fetched correctly
 }
 
 function switchToSortingPhase() {
