@@ -3,22 +3,22 @@ let mergesortSteps = [];
 let currentComparison = null;
 let sortedSongs = [];
 
-document.getElementById('addSongButton').addEventListener('click', () => {
-    const url = document.getElementById('songUrl').value.trim();
-    if (url) {
-        const videoId = extractYouTubeId(url);
-        if (videoId) {
-            fetchVideoTitle(videoId).then(title => {
-                songs.push({ title, videoId });
-                document.getElementById('songUrl').value = '';
+document.getElementById('addPlaylistButton').addEventListener('click', () => {
+    const playlistUrl = document.getElementById('playlistUrl').value.trim();
+    if (playlistUrl) {
+        const playlistId = extractPlaylistId(playlistUrl);
+        if (playlistId) {
+            fetchPlaylistVideos(playlistId).then(videos => {
+                songs = songs.concat(videos);
                 if (songs.length > 1) {
                     document.getElementById('startTournamentButton').style.display = 'inline-block';
                 }
+                alert(`${videos.length} songs added from playlist!`);
             }).catch(error => {
-                alert('Error fetching video title: ' + error.message);
+                alert('Error fetching playlist: ' + error.message);
             });
         } else {
-            alert('Invalid YouTube URL');
+            alert('Invalid YouTube Playlist URL');
         }
     }
 });
@@ -27,8 +27,8 @@ document.getElementById('startTournamentButton').addEventListener('click', start
 
 function startTournament() {
     mergesortSteps = prepareMergeSortSteps(songs);
+    document.getElementById('mainSection').style.display = 'none';
     document.getElementById('rankingSection').style.display = 'block';
-    document.getElementById('results').style.display = 'none';
     processNextComparison();
 }
 
@@ -48,7 +48,7 @@ function prepareMergeSortSteps(arr) {
 
 function processNextComparison() {
     if (!mergesortSteps.length) {
-        sortedSongs = songs; // Replace with actual sorted logic
+        sortedSongs = songs; // Placeholder: Replace with merge sort logic
         displayResults();
         return;
     }
@@ -66,7 +66,7 @@ function processNextComparison() {
 }
 
 function showComparison(leftSong, rightSong) {
-    document.getElementById('comparisonPrompt').innerText = `Which song do you prefer?`;
+    document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
     document.getElementById('leftTitle').innerText = leftSong.title;
     document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
     document.getElementById('rightTitle').innerText = rightSong.title;
@@ -99,18 +99,19 @@ function displayResults() {
     });
 }
 
-function extractYouTubeId(url) {
-    const match = url.match(/[?&]v=([^&#]*)/);
+function extractPlaylistId(url) {
+    const match = url.match(/[?&]list=([^&#]*)/);
     return match ? match[1] : null;
 }
 
-// Fetch title from YouTube video page (this function should handle the error when fetching)
-async function fetchVideoTitle(videoId) {
-    try {
-        const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
-        const text = await response.text();
-        const match = text.match(/<title>(.*?)<\/title>/);
-        if (match && match[1]) {
-            return match[1].replace(' - YouTube', '').trim();
-        }
-        throw new Error('Title not
+async function fetchPlaylistVideos(playlistId) {
+    const response = await fetch(`https://api.example.com/playlist?playlistId=${playlistId}`);
+    const data = await response.json();
+    if (!data || !data.videos) {
+        throw new Error('Invalid playlist data');
+    }
+    return data.videos.map(video => ({
+        title: video.title,
+        videoId: video.id
+    }));
+}
