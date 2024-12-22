@@ -30,61 +30,73 @@ function startTournament() {
     mergesortSteps = prepareMergeSortSteps(songs);
     document.getElementById('mainSection').style.display = 'none';
     document.getElementById('rankingSection').style.display = 'block';
-    processNextComparison();
+    mergeSort(songs);
+    displayResults();
 }
 
-function prepareMergeSortSteps(arr) {
-    const steps = [];
-    function mergeSort(array) {
-        if (array.length <= 1) return array;
-        const mid = Math.floor(array.length / 2);
-        const left = mergeSort(array.slice(0, mid));
-        const right = mergeSort(array.slice(mid));
-        steps.push([left, right]);
-        return [...left, ...right];
-    }
-    mergeSort(arr);
-    return steps.reverse();
+function mergeSort(arr, left = 0, right = arr.length - 1) {
+  if (left >= right) return; // Base case: if the array has one or no element
+
+  const mid = Math.floor((left + right) / 2);
+  
+  // Recursively sort the left and right halves
+  mergeSortInPlace(arr, left, mid);
+  mergeSortInPlace(arr, mid + 1, right);
+
+  // Merge the two sorted halves
+  merge(arr, left, mid, right);
 }
 
-function processNextComparison() {
-    if (!mergesortSteps.length) {
-        sortedSongs = songs; // Placeholder: Replace with merge sort logic
-        displayResults();
-        return;
-    }
+function merge(arr, left, mid, right) {
+  const leftArr = arr.slice(left, mid + 1);  // Left subarray
+  const rightArr = arr.slice(mid + 1, right + 1);  // Right subarray
 
-    const [left, right] = mergesortSteps.pop();
-    currentComparison = { left, right, merged: [] };
+  let i = 0, j = 0, k = left;
 
-    if (!left.length || !right.length) {
-        currentComparison.merged = [...left, ...right];
-        songs = currentComparison.merged;
-        processNextComparison();
+  // Merge the two subarrays back into the original array
+  while (i < leftArr.length && j < rightArr.length) {
+    if (showComparison(leftArr[i], rightArr[j]) {
+      arr[k] = leftArr[i];
+      i++;
     } else {
-        showComparison(left[0], right[0]);
+      arr[k] = rightArr[j];
+      j++;
     }
+    k++;
+  }
+
+  // If any elements remain in the left array, add them
+  while (i < leftArr.length) {
+    arr[k] = leftArr[i];
+    i++;
+    k++;
+  }
+
+  // If any elements remain in the right array, add them
+  while (j < rightArr.length) {
+    arr[k] = rightArr[j];
+    j++;
+    k++;
+  }
 }
 
 function showComparison(leftSong, rightSong) {
-    document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
-    document.getElementById('leftTitle').innerText = leftSong.title;
-    document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
-    document.getElementById('rightTitle').innerText = rightSong.title;
-    document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
-    document.getElementById('chooseLeft').onclick = () => chooseSong(leftSong, rightSong, 'left');
-    document.getElementById('chooseRight').onclick = () => chooseSong(leftSong, rightSong, 'right');
-}
-
-function chooseSong(leftSong, rightSong, choice) {
-    if (choice === 'left') {
-        currentComparison.merged.push(leftSong);
-        currentComparison.left.shift();
-    } else {
-        currentComparison.merged.push(rightSong);
-        currentComparison.right.shift();
-    }
-    processNextComparison();
+    return new Promise((resolve) => {
+        document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
+        document.getElementById('leftTitle').innerText = leftSong.title;
+        document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
+        document.getElementById('rightTitle').innerText = rightSong.title;
+        document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
+        
+        // Create a click handler that resolves the promise
+        document.getElementById('chooseLeft').addEventListener('click', () => {
+            resolve(true);  // true indicates the left song was chosen
+        });
+        
+        document.getElementById('chooseRight').addEventListener('click', () => {
+            resolve(false);  // false indicates the right song was chosen
+        });
+    });
 }
 
 function displayResults() {
