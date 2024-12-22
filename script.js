@@ -56,7 +56,7 @@ async function fetchPlaylist() {
             return;
         }
 
-        const nextPageToken = '';
+        let nextPageToken = '';
         do {
             const response = await gapi.client.youtube.playlistItems.list({
                 part: 'snippet',
