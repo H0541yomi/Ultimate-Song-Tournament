@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Playlist Ranker</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Song Ranking Playlist</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="mainSection">
-        <h1>YouTube Playlist Ranker</h1>
-        <input type="text" id="playlistUrl" placeholder="Enter YouTube Playlist URL">
-        <button id="addPlaylistButton">Add Playlist</button>
-        <button id="startTournamentButton" style="display: none;">Start Tournament</button>
+  <div id="input-phase">
+    <h1>Enter Playlist URL</h1>
+    <input type="text" id="playlist-url" placeholder="Enter YouTube Playlist URL">
+    <button onclick="fetchPlaylist()">Submit</button>
+  </div>
+  <div id="sorting-phase" style="display:none;">
+    <h1>Sorting Playlist</h1>
+    <div id="comparison">
+      <div id="song1">
+        <iframe id="embed1" width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <p id="title1"></p>
+        <p id="creator1"></p>
+        <button onclick="chooseSong(1)">Pick this song as lower</button>
+      </div>
+      <div id="song2">
+        <iframe id="embed2" width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <p id="title2"></p>
+        <p id="creator2"></p>
+        <button onclick="chooseSong(2)">Pick this song as lower</button>
+      </div>
     </div>
+  </div>
+  <div id="results-phase" style="display:none;">
+    <h1>Ranking</h1>
+    <ol id="ranking-list"></ol>
+  </div>
 
-    <div id="rankingSection" style="display: none;">
-        <p id="comparisonPrompt">Which song is better?</p>
-        <div id="songComparison">
-            <div id="leftSong" class="song">
-                <p id="leftTitle"></p>
-                <iframe id="leftVideo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            <div id="rightSong" class="song">
-                <p id="rightTitle"></p>
-                <iframe id="rightVideo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-        <button id="chooseLeft">This Song is Better</button>
-        <button id="chooseRight">This Song is Better</button>
-    </div>
-
-    <div id="results" style="display: none;">
-        <h2>Final Results</h2>
-        <ol id="rankedList"></ol>
-    </div>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
