@@ -106,7 +106,7 @@ function extractPlaylistId(url) {
 }
 
 async function fetchPlaylistVideos(playlistId) {
-    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`;
+    const url = `https://youtube.com/playlist?list=PLQ5H89EGsx5bI-da9ZyhjM2UKBRUiR1C3&si=8_Frn8Bm7Nueg6Uc`;
 
     try {
         const response = await fetch(url);
