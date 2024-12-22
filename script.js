@@ -83,7 +83,7 @@ function switchToSortingPhase() {
 
 // Function to display a comparison between two songs in the sorting phase
 // Params: song1 (Song), song2 (Song)
-// Returns: none
+// Returns: True if left song, false if right song
 function showComparison(song1, song2) {
 
   document.getElementById("embed1").src = song1.ytembed;
@@ -93,14 +93,6 @@ function showComparison(song1, song2) {
   document.getElementById("embed2").src = song2.ytembed;
   document.getElementById("title2").innerText = song2.title;
   document.getElementById("creator2").innerText = song2.creator;
-}
-
-// Function to handle the user's choice of which song is ranked lower
-// Params: song1 (Song), song2 (Song)
-// Returns: choice (bool) - True if left song, false if right song
-function chooseSong(song1, song2) {
-  showComparison();
-  
 }
 
 //Execute mergeSort
@@ -127,7 +119,7 @@ function merge(arr, left, mid, right) {
 
   // Merge the two subarrays back into the original array
   while (i < leftArr.length && j < rightArr.length) {
-    if (chooseSong(leftArr[i], rightArr[i])) {
+    if (showComparison(leftArr[i], rightArr[i])) {
       arr[k] = leftArr[i];
       i++;
     } else {
