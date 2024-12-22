@@ -1,6 +1,6 @@
 let songs = [];
 let currentIndex = 0;
-const apiKey = 'YOUR_YOUTUBE_API_KEY';  // Replace with your YouTube API key
+const apiKey = 'AIzaSyB9GXkUglNRtGVFtV3nZBncxEO8zKEjSGo';  // Replace with your YouTube API key
 let playlistId = '';  // Will be extracted from the URL
 
 class Song {
