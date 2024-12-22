@@ -17,8 +17,9 @@ input, button {
 
 #songComparison {
     display: flex;
-    justify-content: space-around;
+    justify-content: center; /* This centers the comparison div */
     margin: 20px 0;
+    gap: 20px; /* Adds spacing between the two songs */
 }
 
 .song {
@@ -31,8 +32,9 @@ iframe {
 }
 
 #rankedList {
-    list-style-type: none;
+    list-style-type: decimal; /* This makes it a numbered list */
     padding: 0;
+    text-align: left; /* Optional: aligns text to the left in the list */
 }
 
 #rankedList li {
