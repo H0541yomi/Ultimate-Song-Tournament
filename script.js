@@ -1,7 +1,6 @@
 let songs = [];
 let mergesortSteps = [];
 let currentComparison = null;
-let sortedSongs = [];
 const API_KEY = 'AIzaSyB9GXkUglNRtGVFtV3nZBncxEO8zKEjSGo';
 
 document.getElementById('addPlaylistButton').addEventListener('click', () => {
@@ -105,7 +104,7 @@ function displayResults() {
 
     const rankedList = document.getElementById('rankedList');
     rankedList.innerHTML = '';
-    sortedSongs.forEach(song => {
+    songs.forEach(song => {
         const li = document.createElement('li');
         li.innerText = song.title;
         rankedList.appendChild(li);
