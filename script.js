@@ -49,27 +49,12 @@ function prepareMergeSortSteps(arr) {
         let leftIndex = 0;
         let rightIndex = 0;
         while (leftIndex < left.length && rightIndex < right.length) {
-            // Compare based on user choice
-            result.push(compare(left[leftIndex], right[rightIndex]) === 'left' ? left[leftIndex++] : right[rightIndex++]);
+            result.push(left[leftIndex].score > right[rightIndex].score ? left[leftIndex++] : right[rightIndex++]);
         }
         return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
     }
 
     return mergeSort(arr);
-}
-
-function compare(leftSong, rightSong) {
-    return new Promise((resolve) => {
-        showComparison(leftSong, rightSong); // Show the comparison between the two songs
-        document.getElementById('chooseLeft').onclick = () => {
-            console.log('Left choice made'); // Debugging line
-            resolve('left'); // If left is chosen
-        };
-        document.getElementById('chooseRight').onclick = () => {
-            console.log('Right choice made'); // Debugging line
-            resolve('right'); // If right is chosen
-        };
-    });
 }
 
 function processNextComparison() {
@@ -87,17 +72,7 @@ function processNextComparison() {
         songs = currentComparison.merged;
         processNextComparison();
     } else {
-        // Initiate comparison between two songs
-        compare(left[0], right[0]).then(choice => {
-            if (choice === 'left') {
-                currentComparison.merged.push(left[0]);
-                currentComparison.left.shift();
-            } else {
-                currentComparison.merged.push(right[0]);
-                currentComparison.right.shift();
-            }
-            processNextComparison();
-        });
+        showComparison(left[0], right[0]);
     }
 }
 
@@ -107,10 +82,19 @@ function showComparison(leftSong, rightSong) {
     document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
     document.getElementById('rightTitle').innerText = rightSong.title;
     document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
+    document.getElementById('chooseLeft').onclick = () => chooseSong(leftSong, rightSong, 'left');
+    document.getElementById('chooseRight').onclick = () => chooseSong(leftSong, rightSong, 'right');
+}
 
-    // Make sure that the video elements are showing
-    console.log('Left Video:', leftSong.videoId);
-    console.log('Right Video:', rightSong.videoId);
+function chooseSong(leftSong, rightSong, choice) {
+    if (choice === 'left') {
+        currentComparison.merged.push(leftSong);
+        currentComparison.left.shift();
+    } else {
+        currentComparison.merged.push(rightSong);
+        currentComparison.right.shift();
+    }
+    processNextComparison();
 }
 
 function displayResults() {
