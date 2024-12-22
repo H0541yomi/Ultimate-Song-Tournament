@@ -1,93 +1,11 @@
-let authInstance;
 let songs = [];
 let mergesortSteps = [];
 let currentComparison = null;
 let sortedSongs = [];
 
-function initializeClient() {
-    gapi.load('client:auth2', function () {
-        gapi.client.init({
-            clientId: '400708940817-cpvvq9ipank0miiad71bjoplogpiq173.apps.googleusercontent.com',
-            scope: 'https://www.googleapis.com/auth/youtube.readonly'
-        }).then(() => {
-            authInstance = gapi.auth2.getAuthInstance();
-            document.getElementById('loginButton').addEventListener('click', login);
-            document.getElementById('logoutButton').addEventListener('click', logout);
-        }).catch((error) => {
-            console.error('Error initializing Google API client:', error);
-        });
-    });
-}
-
-function login() {
-    authInstance.signIn().then(() => {
-        document.getElementById('loginButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'inline-block';
-        fetchPlaylist();
-    }).catch((error) => {
-        console.error('Error signing in:', error);
-    });
-}
-
-function logout() {
-    authInstance.signOut().then(() => {
-        document.getElementById('loginButton').style.display = 'inline-block';
-        document.getElementById('logoutButton').style.display = 'none';
-        document.getElementById('rankingSection').style.display = 'none';
-        document.getElementById('results').style.display = 'none';
-        songs = [];
-        mergesortSteps = [];
-        sortedSongs = [];
-    }).catch((error) => {
-        console.error('Error signing out:', error);
-    });
-}
-
-async function fetchPlaylist() {
-    const playlistId = prompt('Enter YouTube playlist ID:');
-    if (!playlistId) return;
-
-    try {
-        // Ensure the user is signed in before making the API request
-        if (!authInstance.isSignedIn.get()) {
-            alert('You must be signed in to fetch a playlist.');
-            return;
-        }
-
-        let nextPageToken = '';
-        do {
-            const response = await gapi.client.youtube.playlistItems.list({
-                part: 'snippet',
-                playlistId: playlistId,
-                maxResults: 50,
-                pageToken: nextPageToken
-            });
-
-            if (response.error) {
-                throw new Error('Failed to fetch playlist: ' + response.error.message);
-            }
-
-            songs.push(...response.result.items.map(item => ({
-                title: item.snippet.title,
-                videoId: item.snippet.resourceId.videoId
-            })));
-
-            nextPageToken = response.result.nextPageToken || '';
-        } while (nextPageToken);
-
-        if (songs.length) {
-            startRanking();
-        } else {
-            alert('No songs found in the playlist.');
-        }
-    } catch (error) {
-        console.error('Error fetching playlist:', error);
-        alert('There was an error fetching the playlist.');
-    }
-}
-
 function startRanking() {
     mergesortSteps = prepareMergeSortSteps(songs);
+    document.getElementById('manualEntrySection').style.display = 'none';
     document.getElementById('rankingSection').style.display = 'block';
     document.getElementById('results').style.display = 'none';
     processNextComparison();
@@ -109,7 +27,7 @@ function prepareMergeSortSteps(arr) {
 
 function processNextComparison() {
     if (!mergesortSteps.length) {
-        sortedSongs = songs; // Replace with actual sorted logic
+        sortedSongs = songs;
         displayResults();
         return;
     }
@@ -156,4 +74,33 @@ function displayResults() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initializeClient);
+// Add a song manually via form
+document.getElementById('songForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('songTitle').value;
+    const url = document.getElementById('songUrl').value;
+    
+    if (!title || !url) return;
+    
+    // Extract YouTube video ID from URL
+    const videoId = extractYouTubeId(url);
+    if (videoId) {
+        songs.push({ title, videoId });
+        document.getElementById('songTitle').value = '';
+        document.getElementById('songUrl').value = '';
+    } else {
+        alert('Invalid YouTube URL');
+    }
+});
+
+// Extract video ID from YouTube URL
+function extractYouTubeId(url) {
+    const match = url.match(/[?&]v=([^&#]*)/);
+    return match ? match[1] : null;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('chooseLeft').style.display = 'none';
+    document.getElementById('chooseRight').style.display = 'none';
+});
