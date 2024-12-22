@@ -60,11 +60,13 @@ function prepareMergeSortSteps(arr) {
 
 function compare(leftSong, rightSong) {
     return new Promise((resolve) => {
-        showComparison(leftSong, rightSong);
+        showComparison(leftSong, rightSong); // Show the comparison between the two songs
         document.getElementById('chooseLeft').onclick = () => {
+            console.log('Left choice made'); // Debugging line
             resolve('left'); // If left is chosen
         };
         document.getElementById('chooseRight').onclick = () => {
+            console.log('Right choice made'); // Debugging line
             resolve('right'); // If right is chosen
         };
     });
@@ -105,6 +107,10 @@ function showComparison(leftSong, rightSong) {
     document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
     document.getElementById('rightTitle').innerText = rightSong.title;
     document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
+
+    // Make sure that the video elements are showing
+    console.log('Left Video:', leftSong.videoId);
+    console.log('Right Video:', rightSong.videoId);
 }
 
 function displayResults() {
