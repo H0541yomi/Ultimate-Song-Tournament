@@ -17,24 +17,18 @@ input, button {
 
 #songComparison {
     display: flex;
-    justify-content: center; /* Centers the comparison div */
-    align-items: center; /* Vertically centers the song containers */
+    justify-content: center; /* This centers the comparison div */
     margin: 20px 0;
     gap: 20px; /* Adds spacing between the two songs */
 }
 
 .song {
-    width: 45%; /* Ensures each song takes up 45% of the container */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers the video and title inside the song div */
-    justify-content: center; /* Ensures the content is centered vertically */
+    width: 45%;
 }
 
 iframe {
     width: 100%;
     height: 200px;
-    border: none;
 }
 
 #rankedList {
