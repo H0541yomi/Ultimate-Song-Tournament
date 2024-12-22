@@ -1,46 +1,48 @@
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 20px;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
 }
 
-h1 {
-  font-size: 24px;
+h1, h2 {
+    color: #333;
 }
 
-#input-phase, #sorting-phase, #results-phase {
-  margin: 20px;
+input, button {
+    padding: 10px;
+    margin: 10px;
+    font-size: 16px;
 }
 
-input {
-  padding: 10px;
-  width: 60%;
-  margin-bottom: 10px;
+#songComparison {
+    display: flex;
+    justify-content: center; /* Centers the comparison div */
+    align-items: center; /* Vertically centers the song containers */
+    margin: 20px 0;
+    gap: 20px; /* Adds spacing between the two songs */
 }
 
-button {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
+.song {
+    width: 45%; /* Ensures each song takes up 45% of the container */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the video and title inside the song div */
+    justify-content: center; /* Ensures the content is centered vertically */
 }
 
-button:hover {
-  background-color: #45a049;
+iframe {
+    width: 100%;
+    height: 200px;
+    border: none;
 }
 
-#comparison {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+#rankedList {
+    list-style-type: decimal; /* This makes it a numbered list */
+    padding: 0;
+    text-align: left; /* Optional: aligns text to the left in the list */
 }
 
-#song1, #song2 {
-  width: 40%;
-}
-
-#ranking-list {
-  list-style-type: decimal;
+#rankedList li {
+    margin: 5px 0;
 }
