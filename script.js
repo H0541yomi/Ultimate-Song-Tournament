@@ -41,8 +41,19 @@ function prepareMergeSortSteps(arr) {
         const left = mergeSort(array.slice(0, mid));
         const right = mergeSort(array.slice(mid));
         steps.push([left, right]);
-        return [...left, ...right];
+        return merge(left, right);
     }
+
+    function merge(left, right) {
+        let result = [];
+        let leftIndex = 0;
+        let rightIndex = 0;
+        while (leftIndex < left.length && rightIndex < right.length) {
+            result.push(left[leftIndex].score > right[rightIndex].score ? left[leftIndex++] : right[rightIndex++]);
+        }
+        return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
+    }
+
     mergeSort(arr);
     return steps.reverse();
 }
@@ -93,9 +104,9 @@ function displayResults() {
 
     const rankedList = document.getElementById('rankedList');
     rankedList.innerHTML = '';
-    sortedSongs.forEach(song => {
+    sortedSongs.forEach((song, index) => {
         const li = document.createElement('li');
-        li.innerText = song.title;
+        li.innerText = `${index + 1}. ${song.title}`; // Add the rank number
         rankedList.appendChild(li);
     });
 }
@@ -116,7 +127,8 @@ async function fetchPlaylistVideos(playlistId) {
         const data = await response.json();
         return data.items.map(item => ({
             title: item.snippet.title,
-            videoId: item.snippet.resourceId.videoId
+            videoId: item.snippet.resourceId.videoId,
+            score: Math.random() // Placeholder for user scoring logic
         }));
     } catch (error) {
         console.error('Error fetching playlist videos:', error);
