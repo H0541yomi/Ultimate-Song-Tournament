@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Song Ranker</title>
+    <title>YouTube Playlist Ranker</title>
+    <script src="https://apis.google.com/js/api.js"></script> <!-- Include the Google API script -->
 </head>
 <body>
-    <h1>Song Ranker</h1>
     <button id="loginButton">Login with Google</button>
-    <button id="logoutButton" style="display:none;">Logout</button>
-    <div id="rankingSection" style="display:none;">
+    <button id="logoutButton" style="display: none;">Logout</button>
+    <div id="rankingSection" style="display: none;">
         <p id="comparisonPrompt"></p>
-        <button id="chooseLeft">Choose Left</button>
-        <button id="chooseRight">Choose Right</button>
+        <button id="chooseLeft">Left</button>
+        <button id="chooseRight">Right</button>
     </div>
-    <div id="results" style="display:none;">
-        <h2>Ranked Songs</h2>
+    <div id="results" style="display: none;">
+        <h2>Ranked Playlist</h2>
         <ul id="rankedList"></ul>
     </div>
-    <script src="https://apis.google.com/js/api.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>
+
