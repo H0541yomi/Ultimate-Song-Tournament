@@ -4,20 +4,18 @@ let mergesortSteps = [];
 let currentComparison = null;
 let sortedSongs = [];
 
-function loadClient() {
-    gapi.load('client:auth2', initClient);
-}
-
-function initClient() {
-    gapi.client.init({
-        clientId: '400708940817-cpvvq9ipank0miiad71bjoplogpiq173.apps.googleusercontent.com',
-        scope: 'https://www.googleapis.com/auth/youtube.readonly'
-    }).then(() => {
-        authInstance = gapi.auth2.getAuthInstance();
-        document.getElementById('loginButton').addEventListener('click', login);
-        document.getElementById('logoutButton').addEventListener('click', logout);
-    }).catch((error) => {
-        console.error('Error initializing Google API client:', error);
+function initializeClient() {
+    gapi.load('client:auth2', function () {
+        gapi.client.init({
+            clientId: '400708940817-cpvvq9ipank0miiad71bjoplogpiq173.apps.googleusercontent.com',
+            scope: 'https://www.googleapis.com/auth/youtube.readonly'
+        }).then(() => {
+            authInstance = gapi.auth2.getAuthInstance();
+            document.getElementById('loginButton').addEventListener('click', login);
+            document.getElementById('logoutButton').addEventListener('click', logout);
+        }).catch((error) => {
+            console.error('Error initializing Google API client:', error);
+        });
     });
 }
 
@@ -158,4 +156,4 @@ function displayResults() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', loadClient);
+document.addEventListener('DOMContentLoaded', initializeClient);
