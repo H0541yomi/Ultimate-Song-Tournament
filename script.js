@@ -1,137 +1,106 @@
 let songs = [];
-let mergesortSteps = [];
-let currentComparison = null;
-let sortedSongs = [];
-const API_KEY = 'AIzaSyB9GXkUglNRtGVFtV3nZBncxEO8zKEjSGo';
+let currentIndex = 0;
 
-document.getElementById('addPlaylistButton').addEventListener('click', () => {
-    const playlistUrl = document.getElementById('playlistUrl').value.trim();
-    if (playlistUrl) {
-        const playlistId = extractPlaylistId(playlistUrl);
-        if (playlistId) {
-            fetchPlaylistVideos(playlistId).then(videos => {
-                songs = songs.concat(videos);
-                if (songs.length > 1) {
-                    document.getElementById('startTournamentButton').style.display = 'inline-block';
-                }
-                alert(`${videos.length} songs added from playlist!`);
-            }).catch(error => {
-                alert('Error fetching playlist: ' + error.message);
-            });
-        } else {
-            alert('Invalid YouTube Playlist URL');
-        }
-    }
-});
-
-document.getElementById('startTournamentButton').addEventListener('click', startTournament);
-
-function startTournament() {
-    mergesortSteps = prepareMergeSortSteps(songs);
-    document.getElementById('mainSection').style.display = 'none';
-    document.getElementById('rankingSection').style.display = 'block';
-    processNextComparison();
+class Song {
+  constructor(title, creator, ytembed) {
+    this.title = title;
+    this.creator = creator;
+    this.ytembed = ytembed;
+  }
 }
 
-function prepareMergeSortSteps(arr) {
-    const steps = [];
-    function mergeSort(array) {
-        if (array.length <= 1) return array;
-        const mid = Math.floor(array.length / 2);
-        const left = mergeSort(array.slice(0, mid));
-        const right = mergeSort(array.slice(mid));
-        steps.push([left, right]);
-        return merge(left, right);
-    }
+async function fetchPlaylist() {
+  const playlistUrl = document.getElementById("playlist-url").value;
+  
+  // Fetch playlist data and extract song information (assuming the playlist is valid)
+  // In a real scenario, use the YouTube API to get the playlist details.
+  // For now, we will simulate song objects.
 
-    function merge(left, right) {
-        let result = [];
-        let leftIndex = 0;
-        let rightIndex = 0;
-        while (leftIndex < left.length && rightIndex < right.length) {
-            result.push(left[leftIndex].score > right[rightIndex].score ? left[leftIndex++] : right[rightIndex++]);
-        }
-        return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
-    }
+  songs = [
+    new Song("Song Title 1", "Creator 1", "https://www.youtube.com/embed/example1"),
+    new Song("Song Title 2", "Creator 2", "https://www.youtube.com/embed/example2"),
+    new Song("Song Title 3", "Creator 3", "https://www.youtube.com/embed/example3"),
+    // More songs can be added here
+  ];
 
-    return mergeSort(arr);
+  switchToSortingPhase();
 }
 
-function processNextComparison() {
-    if (!mergesortSteps.length) {
-        sortedSongs = songs; // Placeholder: Replace with merge sort logic
-        displayResults();
-        return;
-    }
-
-    const [left, right] = mergesortSteps.pop();
-    currentComparison = { left, right, merged: [] };
-
-    if (!left.length || !right.length) {
-        currentComparison.merged = [...left, ...right];
-        songs = currentComparison.merged;
-        processNextComparison();
-    } else {
-        showComparison(left[0], right[0]);
-    }
+function switchToSortingPhase() {
+  document.getElementById("input-phase").style.display = "none";
+  document.getElementById("sorting-phase").style.display = "block";
+  showComparison();
 }
 
-function showComparison(leftSong, rightSong) {
-    document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
-    document.getElementById('leftTitle').innerText = leftSong.title;
-    document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
-    document.getElementById('rightTitle').innerText = rightSong.title;
-    document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
-    document.getElementById('chooseLeft').onclick = () => chooseSong(leftSong, rightSong, 'left');
-    document.getElementById('chooseRight').onclick = () => chooseSong(leftSong, rightSong, 'right');
+function showComparison() {
+  const song1 = songs[currentIndex * 2];
+  const song2 = songs[currentIndex * 2 + 1];
+
+  document.getElementById("embed1").src = song1.ytembed;
+  document.getElementById("title1").innerText = song1.title;
+  document.getElementById("creator1").innerText = song1.creator;
+
+  document.getElementById("embed2").src = song2.ytembed;
+  document.getElementById("title2").innerText = song2.title;
+  document.getElementById("creator2").innerText = song2.creator;
 }
 
-function chooseSong(leftSong, rightSong, choice) {
-    if (choice === 'left') {
-        currentComparison.merged.push(leftSong);
-        currentComparison.left.shift();
-    } else {
-        currentComparison.merged.push(rightSong);
-        currentComparison.right.shift();
-    }
-    processNextComparison();
+function chooseSong(choice) {
+  const song1 = songs[currentIndex * 2];
+  const song2 = songs[currentIndex * 2 + 1];
+  
+  if (choice === 1) {
+    // Song 1 is lower
+    [song1, song2] = [song2, song1];
+  }
+
+  songs[currentIndex * 2] = song1;
+  songs[currentIndex * 2 + 1] = song2;
+
+  currentIndex++;
+
+  if (currentIndex * 2 >= songs.length) {
+    // Sorting done, move to results phase
+    mergeSort(songs);
+    switchToResultsPhase();
+  } else {
+    showComparison();
+  }
 }
 
-function displayResults() {
-    document.getElementById('rankingSection').style.display = 'none';
-    document.getElementById('results').style.display = 'block';
+function mergeSort(arr) {
+  if (arr.length <= 1) return arr;
 
-    const rankedList = document.getElementById('rankedList');
-    rankedList.innerHTML = '';
-    sortedSongs.forEach((song, index) => {
-        const li = document.createElement('li');
-        li.innerText = `${index + 1}. ${song.title}`; // Add the rank number
-        rankedList.appendChild(li);
-    });
+  const mid = Math.floor(arr.length / 2);
+  const left = mergeSort(arr.slice(0, mid));
+  const right = mergeSort(arr.slice(mid));
+
+  return merge(left, right);
 }
 
-function extractPlaylistId(url) {
-    const match = url.match(/[?&]list=([^&#]*)/);
-    return match ? match[1] : null;
+function merge(left, right) {
+  let result = [];
+  let i = 0;
+  let j = 0;
+
+  while (i < left.length && j < right.length) {
+    result.push(left[i].title < right[j].title ? left[i++] : right[j++]);
+  }
+
+  return result.concat(left.slice(i), right.slice(j));
 }
 
-async function fetchPlaylistVideos(playlistId) {
-    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`;
+function switchToResultsPhase() {
+  document.getElementById("sorting-phase").style.display = "none";
+  document.getElementById("results-phase").style.display = "block";
+  showResults();
+}
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data.items.map(item => ({
-            title: item.snippet.title,
-            videoId: item.snippet.resourceId.videoId,
-            score: Math.random() // Placeholder for user scoring logic
-        }));
-    } catch (error) {
-        console.error('Error fetching playlist videos:', error);
-        alert('Failed to fetch playlist videos. Please check the playlist ID and try again.');
-        throw error;
-    }
+function showResults() {
+  const rankingList = document.getElementById("ranking-list");
+  songs.forEach((song, index) => {
+    const li = document.createElement("li");
+    li.innerText = `${index + 1}. ${song.title} - ${song.creator}`;
+    rankingList.appendChild(li);
+  });
 }
