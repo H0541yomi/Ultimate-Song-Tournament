@@ -54,8 +54,7 @@ function prepareMergeSortSteps(arr) {
         return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
     }
 
-    mergeSort(arr);
-    return steps.reverse();
+    return mergeSort(arr);
 }
 
 function processNextComparison() {
