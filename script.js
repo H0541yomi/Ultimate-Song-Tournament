@@ -1,81 +1,140 @@
-const startButton = document.getElementById('startButton');
-const playlistInput = document.getElementById('playlistInput');
-const comparisonDiv = document.getElementById('comparison');
-const resultsDiv = document.getElementById('results');
-
-// Your YouTube API key
-const API_KEY = 'YOUR_YOUTUBE_API_KEY_HERE';
-
+let authInstance;
 let songs = [];
+let mergesortSteps = [];
+let currentComparison = null;
 let sortedSongs = [];
 
-startButton.addEventListener('click', async () => {
-    const playlistUrl = playlistInput.value;
-    const playlistId = new URLSearchParams(new URL(playlistUrl).search).get('list');
+function loadClient() {
+    gapi.load('client:auth2', initClient);
+}
 
-    if (!playlistId) {
-        alert('Invalid playlist URL!');
-        return;
-    }
+function initClient() {
+    gapi.client.init({
+        clientId: '400708940817-cpvvq9ipank0miiad71bjoplogpiq173.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/youtube.readonly'
+    }).then(() => {
+        authInstance = gapi.auth2.getAuthInstance();
+        document.getElementById('loginButton').addEventListener('click', login);
+        document.getElementById('logoutButton').addEventListener('click', logout);
+    });
+}
 
-    songs = await fetchSongsFromPlaylist(playlistId);
-    if (songs.length === 0) {
-        alert('No songs found in the playlist!');
-        return;
-    }
+function login() {
+    authInstance.signIn().then(() => {
+        document.getElementById('loginButton').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'inline-block';
+        fetchPlaylist();
+    });
+}
 
-    sortedSongs = await mergeSortWithUser(songs);
-    resultsDiv.innerHTML = "<h2>Ranking:</h2>" + sortedSongs.map(s => `<p>${s.title}</p>`).join('');
-});
+function logout() {
+    authInstance.signOut().then(() => {
+        document.getElementById('loginButton').style.display = 'inline-block';
+        document.getElementById('logoutButton').style.display = 'none';
+        document.getElementById('rankingSection').style.display = 'none';
+        document.getElementById('results').style.display = 'none';
+        songs = [];
+        mergesortSteps = [];
+        sortedSongs = [];
+    });
+}
 
-async function fetchSongsFromPlaylist(playlistId) {
+async function fetchPlaylist() {
+    const playlistId = prompt('Enter YouTube playlist ID:');
+    if (!playlistId) return;
+
     let nextPageToken = '';
-    let songList = [];
-
     do {
-        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&pageToken=${nextPageToken}&key=${API_KEY}`);
-        const data = await response.json();
-        songList.push(...data.items.map(item => ({
+        const response = await gapi.client.youtube.playlistItems.list({
+            part: 'snippet',
+            playlistId: playlistId,
+            maxResults: 50,
+            pageToken: nextPageToken
+        });
+
+        songs.push(...response.result.items.map(item => ({
             title: item.snippet.title,
             videoId: item.snippet.resourceId.videoId
         })));
-        nextPageToken = data.nextPageToken || '';
+
+        nextPageToken = response.result.nextPageToken || '';
     } while (nextPageToken);
 
-    return songList;
-}
-
-async function mergeSortWithUser(arr) {
-    if (arr.length <= 1) return arr;
-
-    const mid = Math.floor(arr.length / 2);
-    const left = await mergeSortWithUser(arr.slice(0, mid));
-    const right = await mergeSortWithUser(arr.slice(mid));
-
-    return await merge(left, right);
-}
-
-async function merge(left, right) {
-    let result = [];
-    while (left.length && right.length) {
-        const choice = await promptUser(left[0], right[0]);
-        if (choice === left[0]) {
-            result.push(left.shift());
-        } else {
-            result.push(right.shift());
-        }
+    if (songs.length) {
+        startRanking();
+    } else {
+        alert('No songs found in the playlist.');
     }
-    return result.concat(left, right);
 }
 
-function promptUser(song1, song2) {
-    return new Promise(resolve => {
-        comparisonDiv.innerHTML = `
-            <h3>Which song do you prefer?</h3>
-            <button id="song1">${song1.title}</button>
-            <button id="song2">${song2.title}</button>
-        `;
-        document.getElementById('song1').onclick = () => resolve(song1);
-        document.getElementById('song2').onclick = () => resolve(song2);
+function startRanking() {
+    mergesortSteps = prepareMergeSortSteps(songs);
+    document.getElementById('rankingSection').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    processNextComparison();
+}
+
+function prepareMergeSortSteps(arr) {
+    const steps = [];
+    function mergeSort(array) {
+        if (array.length <= 1) return array;
+        const mid = Math.floor(array.length / 2);
+        const left = mergeSort(array.slice(0, mid));
+        const right = mergeSort(array.slice(mid));
+        steps.push([left, right]);
+        return [...left, ...right];
+    }
+    mergeSort(arr);
+    return steps.reverse();
+}
+
+function processNextComparison() {
+    if (!mergesortSteps.length) {
+        sortedSongs = songs; // Replace with actual sorted logic
+        displayResults();
+        return;
+    }
+
+    const [left, right] = mergesortSteps.pop();
+    currentComparison = { left, right, merged: [] };
+
+    if (!left.length || !right.length) {
+        currentComparison.merged = [...left, ...right];
+        songs = currentComparison.merged;
+        processNextComparison();
+    } else {
+        showComparison(left[0], right[0]);
+    }
+}
+
+function showComparison(leftSong, rightSong) {
+    document.getElementById('comparisonPrompt').innerText = `Which song do you prefer?\nLeft: ${leftSong.title} vs Right: ${rightSong.title}`;
+    document.getElementById('chooseLeft').onclick = () => chooseSong(leftSong, rightSong, 'left');
+    document.getElementById('chooseRight').onclick = () => chooseSong(leftSong, rightSong, 'right');
+}
+
+function chooseSong(leftSong, rightSong, choice) {
+    if (choice === 'left') {
+        currentComparison.merged.push(leftSong);
+        currentComparison.left.shift();
+    } else {
+        currentComparison.merged.push(rightSong);
+        currentComparison.right.shift();
+    }
+    processNextComparison();
+}
+
+function displayResults() {
+    document.getElementById('rankingSection').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+
+    const rankedList = document.getElementById('rankedList');
+    rankedList.innerHTML = '';
+    sortedSongs.forEach(song => {
+        const li = document.createElement('li');
+        li.innerText = song.title;
+        rankedList.appendChild(li);
     });
 }
+
+document.addEventListener('DOMContentLoaded', loadClient);
