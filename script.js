@@ -54,7 +54,7 @@ function merge(arr, left, mid, right) {
 
   // Merge the two subarrays back into the original array
   while (i < leftArr.length && j < rightArr.length) {
-    const isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
+    const isLeftChosen = showComparison(leftArr[i], rightArr[j]);
     if (isLeftChosen) {
       arr[k] = leftArr[i];
       i++;
