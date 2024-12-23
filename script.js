@@ -26,7 +26,6 @@ document.getElementById('addPlaylistButton').addEventListener('click', () => {
 document.getElementById('startTournamentButton').addEventListener('click', startTournament);
 
 function startTournament() {
-    mergesortSteps = prepareMergeSortSteps(songs);
     document.getElementById('mainSection').style.display = 'none';
     document.getElementById('rankingSection').style.display = 'block';
     mergeSort(songs);
