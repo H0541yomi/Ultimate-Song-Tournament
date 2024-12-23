@@ -46,13 +46,13 @@ function mergeSort(arr) {
     return merge(mergeSort(left), mergeSort(right));
 }
 
-function merge(left, right) {
+async function merge(left, right) {
     const result = [];
     let i = 0, j = 0;
 
     // Compare elements from both arrays and add the smaller one to the result
     while (i < left.length && j < right.length) {
-        let songChoose = showComparison(left[i], right[j]);
+        let songChoose = await showComparison(left[i], right[j]);
         if (songChoose) {
             result.push(left[i]);
             i++;
