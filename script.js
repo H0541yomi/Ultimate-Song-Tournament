@@ -42,7 +42,7 @@ async function mergeSort(arr, left = 0, right = arr.length - 1) {
   mergeSort(arr, mid + 1, right);
 
   // Merge the two sorted halves, and ensure this finishes before continuing
-  merge(arr, left, mid, right);
+  await merge(arr, left, mid, right);
 }
 
 
