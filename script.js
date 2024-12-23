@@ -31,52 +31,56 @@ function startTournament() {
     mergeSort(songs);
 }
 
-function mergeSort(arr, left = 0, right = arr.length - 1) {
-  if (left >= right) return; // Base case: if the array has one or no element
-
-  const mid = Math.floor((left + right) / 2);
-  
-  // Recursively sort the left and right halves
-  mergeSort(arr, left, mid);
-  mergeSort(arr, mid + 1, right);
-
-  // Merge the two sorted halves
-  merge(arr, left, mid, right);
-}
-
-async function merge(arr, left, mid, right) {
-  const leftArr = arr.slice(left, mid + 1);  // Left subarray
-  const rightArr = arr.slice(mid + 1, right + 1);  // Right subarray
-
-  let i = 0, j = 0, k = left;
-
-  // Merge the two subarrays back into the original array
-  while (i < leftArr.length && j < rightArr.length) {
-    const isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
-    if (isLeftChosen) {
-      arr[k] = leftArr[i];
-      i++;
-    } else {
-      arr[k] = rightArr[j];
-      j++;
+function mergeSort(arr) {
+    // Base case: Arrays with 0 or 1 element are already sorted
+    if (arr.length <= 1) {
+        return arr;
     }
-    k++;
-  }
 
-  // If any elements remain in the left array, add them
-  while (i < leftArr.length) {
-    arr[k] = leftArr[i];
-    i++;
-    k++;
-  }
+    // Split the array into two halves
+    const mid = Math.floor(arr.length / 2);
+    const left = arr.slice(0, mid);
+    const right = arr.slice(mid);
 
-  // If any elements remain in the right array, add them
-  while (j < rightArr.length) {
-    arr[k] = rightArr[j];
-    j++;
-    k++;
-  }
+    // Recursively sort both halves and merge the results
+    return merge(mergeSort(left), mergeSort(right));
 }
+
+function merge(left, right) {
+    const result = [];
+    let i = 0, j = 0;
+
+    // Compare elements from both arrays and add the smaller one to the result
+    while (i < left.length && j < right.length) {
+        if (showComparison(left[i], right[j]) {
+            result.push(left[i]);
+            i++;
+        } else {
+            result.push(right[j]);
+            j++;
+        }
+    }
+
+    // Add any remaining elements from the left array
+    while (i < left.length) {
+        result.push(left[i]);
+        i++;
+    }
+
+    // Add any remaining elements from the right array
+    while (j < right.length) {
+        result.push(right[j]);
+        j++;
+    }
+
+    return result;
+}
+
+// Example usage
+const unsortedArray = [5, 3, 8, 6, 2, 7, 4, 1];
+const sortedArray = mergeSort(unsortedArray);
+console.log(sortedArray); // [1, 2, 3, 4, 5, 6, 7, 8]
+
 
 function showComparison(leftSong, rightSong) {
     document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
