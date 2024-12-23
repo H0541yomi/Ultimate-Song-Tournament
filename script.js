@@ -32,18 +32,19 @@ function startTournament() {
     displayResults();
 }
 
-function mergeSort(arr, left = 0, right = arr.length - 1) {
+async function mergeSort(arr, left = 0, right = arr.length - 1) {
   if (left >= right) return; // Base case: if the array has one or no element
 
   const mid = Math.floor((left + right) / 2);
   
-  // Recursively sort the left and right halves
-  mergeSort(arr, left, mid);
-  mergeSort(arr, mid + 1, right);
+  // Recursively sort the left and right halves and wait for them to complete
+  await mergeSort(arr, left, mid);
+  await mergeSort(arr, mid + 1, right);
 
-  // Merge the two sorted halves
-  merge(arr, left, mid, right);
+  // Merge the two sorted halves, and ensure this finishes before continuing
+  await merge(arr, left, mid, right);
 }
+
 
 async function merge(arr, left, mid, right) {
   const leftArr = arr.slice(left, mid + 1);  // Left subarray
