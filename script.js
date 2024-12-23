@@ -45,7 +45,7 @@ function mergeSort(arr, left = 0, right = arr.length - 1) {
   merge(arr, left, mid, right);
 }
 
-function merge(arr, left, mid, right) {
+async function merge(arr, left, mid, right) {
   const leftArr = arr.slice(left, mid + 1);  // Left subarray
   const rightArr = arr.slice(mid + 1, right + 1);  // Right subarray
 
@@ -53,7 +53,7 @@ function merge(arr, left, mid, right) {
 
   // Merge the two subarrays back into the original array
   while (i < leftArr.length && j < rightArr.length) {
-    const isLeftChosen = showComparison(leftArr[i], rightArr[j]);
+    const isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
     if (isLeftChosen) {
       arr[k] = leftArr[i];
       i++;
