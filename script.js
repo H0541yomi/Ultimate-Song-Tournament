@@ -53,9 +53,9 @@ async function merge(arr, left, mid, right) {
 
   // Merge the two subarrays back into the original array
   while (i < leftArr.length && j < rightArr.length) {
-    const isLeftChosen;
+    let isLeftChosen;
     while (isLeftChosen === null) {
-        const isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
+        isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
     }
     if (isLeftChosen) {
       arr[k] = leftArr[i];
@@ -91,12 +91,6 @@ function showComparison(leftSong, rightSong) {
         const rightVideo = document.getElementById('rightVideo');
         const chooseLeftButton = document.getElementById('chooseLeft');
         const chooseRightButton = document.getElementById('chooseRight');
-
-        if (!comparisonPrompt || !leftTitle || !leftVideo || !rightTitle || !rightVideo || !chooseLeftButton || !chooseRightButton) {
-            console.error("One or more elements are missing in the DOM.");
-            resolve(null); // Graceful fallback
-            return;
-        }
 
         // Set up UI
         comparisonPrompt.innerText = 'Which song is better?';
