@@ -55,6 +55,7 @@ async function merge(arr, left, mid, right) {
   while (i < leftArr.length && j < rightArr.length) {
     let isLeftChosen = null;
     while (isLeftChosen !== true && isLeftChosen !== false) {
+        console.log(leftArr[i], rightArr[j], i, j);
         isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
     }
     if (isLeftChosen) {
