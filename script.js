@@ -54,7 +54,7 @@ async function merge(arr, left, mid, right) {
   // Merge the two subarrays back into the original array
   while (i < leftArr.length && j < rightArr.length) {
     let isLeftChosen = null;
-    while (isLeftChosen != true && isLeftChosen != false) {
+    while (isLeftChosen !== true && isLeftChosen !== false) {
         isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
     }
     if (isLeftChosen) {
