@@ -52,7 +52,8 @@ function merge(left, right) {
 
     // Compare elements from both arrays and add the smaller one to the result
     while (i < left.length && j < right.length) {
-        if (showComparison(left[i], right[j]) {
+        let songChoose = showComparison(left[i], right[j];
+        if (songChoose) {
             result.push(left[i]);
             i++;
         } else {
