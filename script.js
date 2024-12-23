@@ -29,22 +29,20 @@ function startTournament() {
     document.getElementById('mainSection').style.display = 'none';
     document.getElementById('rankingSection').style.display = 'block';
     mergeSort(songs);
-    displayResults();
 }
 
-async function mergeSort(arr, left = 0, right = arr.length - 1) {
+function mergeSort(arr, left = 0, right = arr.length - 1) {
   if (left >= right) return; // Base case: if the array has one or no element
 
   const mid = Math.floor((left + right) / 2);
   
-  // Recursively sort the left and right halves and wait for them to complete
+  // Recursively sort the left and right halves
   mergeSort(arr, left, mid);
   mergeSort(arr, mid + 1, right);
 
-  // Merge the two sorted halves, and ensure this finishes before continuing
-  await merge(arr, left, mid, right);
+  // Merge the two sorted halves
+  merge(arr, left, mid, right);
 }
-
 
 async function merge(arr, left, mid, right) {
   const leftArr = arr.slice(left, mid + 1);  // Left subarray
@@ -54,11 +52,7 @@ async function merge(arr, left, mid, right) {
 
   // Merge the two subarrays back into the original array
   while (i < leftArr.length && j < rightArr.length) {
-    let isLeftChosen = null;
-    while (isLeftChosen !== true && isLeftChosen !== false) {
-        console.log(leftArr[i], rightArr[j], i, j);
-        isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
-    }
+    const isLeftChosen = await showComparison(leftArr[i], rightArr[j]);
     if (isLeftChosen) {
       arr[k] = leftArr[i];
       i++;
@@ -85,47 +79,20 @@ async function merge(arr, left, mid, right) {
 }
 
 function showComparison(leftSong, rightSong) {
-    return new Promise((resolve) => {
-        const comparisonPrompt = document.getElementById('comparisonPrompt');
-        const leftTitle = document.getElementById('leftTitle');
-        const leftVideo = document.getElementById('leftVideo');
-        const rightTitle = document.getElementById('rightTitle');
-        const rightVideo = document.getElementById('rightVideo');
-        const chooseLeftButton = document.getElementById('chooseLeft');
-        const chooseRightButton = document.getElementById('chooseRight');
-
-        // Set up UI
-        comparisonPrompt.innerText = 'Which song is better?';
-        leftTitle.innerText = leftSong.title;
-        leftVideo.src = `https://www.youtube.com/embed/${leftSong.videoId}`;
-        rightTitle.innerText = rightSong.title;
-        rightVideo.src = `https://www.youtube.com/embed/${rightSong.videoId}`;
-
-        // Define handlers
-        const onChooseLeft = () => {
-            console.log('Left song chosen');
-            cleanup();
-            resolve(true);
-        };
-
-        const onChooseRight = () => {
-            console.log('Right song chosen');
-            cleanup();
-            resolve(false);
-        };
-
-        // Cleanup function to remove event listeners
-        function cleanup() {
-            chooseLeftButton.removeEventListener('click', onChooseLeft);
-            chooseRightButton.removeEventListener('click', onChooseRight);
-        }
-
-        // Attach event listeners
-        chooseLeftButton.addEventListener('click', onChooseLeft);
-        chooseRightButton.addEventListener('click', onChooseRight);
+    document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
+    document.getElementById('leftTitle').innerText = leftSong.title;
+    document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
+    document.getElementById('rightTitle').innerText = rightSong.title;
+    document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
+    
+    document.getElementById('chooseLeft').addEventListener('click', () => {
+        return true;
+    });
+    
+    document.getElementById('chooseRight').addEventListener('click', () => {
+        return false;
     });
 }
-
 
 function displayResults() {
     document.getElementById('rankingSection').style.display = 'none';
