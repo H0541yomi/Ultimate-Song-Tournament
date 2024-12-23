@@ -38,8 +38,8 @@ function mergeSort(arr, left = 0, right = arr.length - 1) {
   const mid = Math.floor((left + right) / 2);
   
   // Recursively sort the left and right halves
-  mergeSortInPlace(arr, left, mid);
-  mergeSortInPlace(arr, mid + 1, right);
+  mergeSort(arr, left, mid);
+  mergeSort(arr, mid + 1, right);
 
   // Merge the two sorted halves
   merge(arr, left, mid, right);
