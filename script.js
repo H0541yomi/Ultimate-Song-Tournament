@@ -46,13 +46,13 @@ function mergeSort(arr) {
     return merge(mergeSort(left), mergeSort(right));
 }
 
-async function merge(left, right) {
+function merge(left, right) {
     const result = [];
     let i = 0, j = 0;
 
     // Compare elements from both arrays and add the smaller one to the result
     while (i < left.length && j < right.length) {
-        let songChoose = await showComparison(left[i], right[j]);
+        let songChoose = showComparison(left[i], right[j]);
         if (songChoose) {
             result.push(left[i]);
             i++;
@@ -77,26 +77,39 @@ async function merge(left, right) {
     return result;
 }
 
-// Example usage
-const unsortedArray = [5, 3, 8, 6, 2, 7, 4, 1];
-const sortedArray = mergeSort(unsortedArray);
-console.log(sortedArray); // [1, 2, 3, 4, 5, 6, 7, 8]
 
+let waitForPressResolve;
 
-function showComparison(leftSong, rightSong) {
+function waitForPress() {
+    return new Promise(resolve => waitForPressResolve = resolve);
+}
+
+function resolveComparison(choice) {
+    if (waitForPressResolve) {
+        waitForPressResolve(choice);
+        waitForPressResolve = null;
+    }
+}
+
+async function showComparison(leftSong, rightSong) {
     document.getElementById('comparisonPrompt').innerText = 'Which song is better?';
     document.getElementById('leftTitle').innerText = leftSong.title;
     document.getElementById('leftVideo').src = `https://www.youtube.com/embed/${leftSong.videoId}`;
     document.getElementById('rightTitle').innerText = rightSong.title;
     document.getElementById('rightVideo').src = `https://www.youtube.com/embed/${rightSong.videoId}`;
     
-    document.getElementById('chooseLeft').addEventListener('click', () => {
-        return true;
-    });
-    
-    document.getElementById('chooseRight').addEventListener('click', () => {
-        return false;
-    });
+    // Add event listeners for user input
+    document.getElementById('chooseLeft').addEventListener('click', () => resolveComparison(true));
+    document.getElementById('chooseRight').addEventListener('click', () => resolveComparison(false));
+
+    // Wait for the user's decision
+    const choice = await waitForPress();
+
+    // Clean up event listeners after resolving
+    document.getElementById('chooseLeft').removeEventListener('click', () => resolveComparison(true));
+    document.getElementById('chooseRight').removeEventListener('click', () => resolveComparison(false));
+
+    return choice;
 }
 
 function displayResults() {
