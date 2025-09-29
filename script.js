@@ -1,7 +1,7 @@
 let songs = [];
 let mergesortSteps = [];
 let currentComparison = null;
-const API_KEY = 'AIzaSyB9GXkUglNRtGVFtV3nZBncxEO8zKEjSGo';
+const API_KEY = 'AIzaSyB9GXkUglNRtGVFtV3nZBncxEO8zKEjSGo'; // Deleted obviously
 
 document.getElementById('addPlaylistButton').addEventListener('click', () => {
     const playlistUrl = document.getElementById('playlistUrl').value.trim();
